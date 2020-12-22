@@ -5,8 +5,6 @@ var token =
   "T1==cGFydG5lcl9pZD00NjUwMTA1MiZzaWc9ZDIyMmQ0N2IyMmI4YWRjZDE0MDBmN2I3OTYyZDc4MmJhMTY5Zjc4MTpzZXNzaW9uX2lkPTJfTVg0ME5qVXdNVEExTW41LU1UWXdOelV4TnpBME16STBPWDVtYnpGT1kwNDRNVE5JVUU5blIyNVVNVmx1VnpOeWMyMS1mZyZjcmVhdGVfdGltZT0xNjA3NTE3MDU1Jm5vbmNlPTAuODc1NTQwNjk2NjQwMzA1OSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjEwMTA5MDU0JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
 var publisher;
 
-import getStatsResult from "./getStats";
-
 function handleError(error) {
   if (error) {
     console.error(error);
@@ -15,6 +13,7 @@ function handleError(error) {
 
 function initializeSession() {
   var session = OT.initSession(apiKey, sessionId, {});
+  publisher = OT.initPublisher("publisher");
 
   session.on("streamCreated", function streamCreated(event) {
     var subscriberOptions = {
@@ -47,8 +46,11 @@ function initializeSession() {
 } // todo complete with get-stats // See the config.js file.
 
 function runStats() {
-  if (!publisher) {
-    getStatsResult(publisher);
+  if (publisher) {
+    const aStats = pubStats();
+    aStats.run(publisher).then((result) => {
+      console.log("GetStats Test done: ", result);
+    });
   }
 }
 
