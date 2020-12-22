@@ -1,5 +1,9 @@
-const TIME_WINDOW = 1; // Run test every X time
-const TIME_SPAN_AUDIO_TEST = 10;
+const RUN_INTERVAL_TIMEOUT = 1000; // Run test every X time
+const TEST_TIME_SPAN = 15;
+const AUDIO_BW_THRESHOLD = 25e3;
+const AUDIO_PL = 0.05;
+const VIDEO_BW_THRESHOLD = 150e3;
+const VIDEO_PL = 0.03;
 const CHECK_VIDEO_QUALITY_AUDIO_ONLY = "AUDIO_ONLY";
 const CHECK_AUDIO_QUALITY_BANDWIDTH_TOO_LOW = "BANDWIDTH_TOO_LOW";
 const AUDIO_VIDEO_SUPPORTED = "AUDIO_VIDEO_SUPPORTED";
@@ -16,17 +20,17 @@ function pubStats() {
   this.prevAudioBytes = 0;
   this.audioPLRatio = 0;
   this.audioBw = 0;
-  this.audioOnlyThreshold = 25e3; // 25000bps acceptable audio
-  this.audioPLThreshold = 0.05;
+  this.audioOnlyThreshold = AUDIO_BW_THRESHOLD; // 25000bps acceptable audio
+  this.audioPLThreshold = AUDIO_PL;
   this.prevVideoPacketsLost = 0;
   this.prevVideoPacketsSent = 0;
   this.prevVideoBytes = 0;
   this.videoPLRatio = 0;
   this.videoBw = 0;
-  this.videoThreshold = 150e3;
-  this.videoPLThreshold = 0.03;
+  this.videoThreshold = VIDEO_BW_THRESHOLD;
+  this.videoPLThreshold = VIDEO_PL;
   this.runInterval = null;
-  this.runIntervalTimeout = 1000;
+  this.runIntervalTimeout = RUN_INTERVAL_TIMEOUT;
   this.testDone = false;
   this.result = {};
 
@@ -39,7 +43,7 @@ function pubStats() {
           }
           await checkStats(publisher);
           const now = Date.now() / 1000;
-          if (now - this.startTestTime > TIME_SPAN_AUDIO_TEST) {
+          if (now - this.startTestTime > TEST_TIME_SPAN) {
             checkQuality();
             clearInterval(this.runInterval);
             console.log("Run Result", this.result);
@@ -71,49 +75,47 @@ function pubStats() {
           this.prevAudioBytes = audioStats.bytesSent;
           this.prevVideoBytes = videoStats.bytesSent;
         }
-        if (nowTimestamp - this.prevTimestamp >= TIME_WINDOW) {
-          //calculate audio packets lost ratio
-          if (this.prevAudioPacketsSent !== 0) {
-            const audiopl = audioStats.packetsLost - this.prevAudioPacketsLost;
-            let audiops = audioStats.packetsSent - this.prevAudioPacketsSent;
-            let audiopt = audiopl + audiops;
+        //calculate audio packets lost ratio
+        if (this.prevAudioPacketsSent !== 0) {
+          const audiopl = audioStats.packetsLost - this.prevAudioPacketsLost;
+          let audiops = audioStats.packetsSent - this.prevAudioPacketsSent;
+          let audiopt = audiopl + audiops;
 
-            if (audiopt > 0) {
-              this.audioPLRatio = audiopl / audiopt;
-            }
+          if (audiopt > 0) {
+            this.audioPLRatio = audiopl / audiopt;
           }
-          if (this.prevVideoPacketsSent !== 0) {
-            const videopl = videoStats.packetsLost - this.prevVideoPacketsLost;
-            let videops = videoStats.packetsSent - this.prevVideoPacketsSent;
-            let videopt = videopl + videops;
-
-            if (videopt > 0) {
-              this.videoPLRatio = videopl / videopt;
-            }
-          }
-
-          this.prevAudioPacketsLost = audioStats.packetsLost;
-          this.prevAudioPacketsSent = audioStats.packetsSent;
-          this.prevVideoPacketsLost = videoStats.packetsLost;
-          this.prevVideoPacketsSent = videoStats.packetsSent;
-
-          //calculate audio bandwidth
-          this.audioBw =
-            (8 * (audioStats.bytesSent - this.prevAudioBytes)) /
-            (nowTimestamp - this.prevTimestamp);
-
-          //calculate video bandwidth
-          this.videoBw =
-            (8 * (videoStats.bytesSent - this.prevVideoBytes)) /
-            (nowTimestamp - this.prevTimestamp);
-
-          this.prevTimestamp = nowTimestamp;
-          this.prevAudioBytes = audioStats.packetsSent;
-          this.prevVideoBytes = videoStats.packetsSent;
-          console.log("checkStats - Audio", this.audioBw);
-          console.log("checkStats - Video", this.videoBw);
-          resolve();
         }
+        if (this.prevVideoPacketsSent !== 0) {
+          const videopl = videoStats.packetsLost - this.prevVideoPacketsLost;
+          let videops = videoStats.packetsSent - this.prevVideoPacketsSent;
+          let videopt = videopl + videops;
+
+          if (videopt > 0) {
+            this.videoPLRatio = videopl / videopt;
+          }
+        }
+
+        this.prevAudioPacketsLost = audioStats.packetsLost;
+        this.prevAudioPacketsSent = audioStats.packetsSent;
+        this.prevVideoPacketsLost = videoStats.packetsLost;
+        this.prevVideoPacketsSent = videoStats.packetsSent;
+
+        //calculate audio bandwidth
+        this.audioBw =
+          (8 * (audioStats.bytesSent - this.prevAudioBytes)) /
+          (nowTimestamp - this.prevTimestamp);
+
+        //calculate video bandwidth
+        this.videoBw =
+          (8 * (videoStats.bytesSent - this.prevVideoBytes)) /
+          (nowTimestamp - this.prevTimestamp);
+
+        this.prevTimestamp = nowTimestamp;
+        this.prevAudioBytes = audioStats.packetsSent;
+        this.prevVideoBytes = videoStats.packetsSent;
+        console.log("checkStats - Audio", this.audioBw);
+        console.log("checkStats - Video", this.videoBw);
+        resolve();
       });
     });
   };
@@ -127,9 +129,13 @@ function pubStats() {
     this.result = {
       audio: {
         supported: true,
+        audioBw: this.audioBw,
+        audioPLRatio: this.audioPLRatio,
       },
       video: {
         supported: true,
+        videoBw: this.videoBw,
+        videoPLRatio: this.videoPLRatio,
       },
       message: AUDIO_VIDEO_SUPPORTED,
     };
