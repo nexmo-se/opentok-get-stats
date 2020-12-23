@@ -1,5 +1,5 @@
-const RUN_INTERVAL_TIMEOUT = 1000; // Run test every X time
-const TEST_TIME_SPAN = 15;
+const RUN_INTERVAL_TIMEOUT = 500; // Run test every X ms
+const TEST_TIME_SPAN = 5;
 const AUDIO_BW_THRESHOLD = 25e3;
 const AUDIO_PL = 0.05;
 const VIDEO_BW_THRESHOLD = 150e3;
@@ -34,6 +34,11 @@ function pubStats() {
   this.testDone = false;
   this.result = {};
 
+  /**
+   * This functions run the getStats method for TEST_TIME_SPAN duration.
+   * It returns a promise with the result object
+   * @param {*} publisher from Opentok Library
+   */
   const run = (publisher) => {
     return new Promise((resolve) => {
       this.runInterval = setInterval(async () => {
@@ -46,17 +51,25 @@ function pubStats() {
           if (now - this.startTestTime > TEST_TIME_SPAN) {
             checkQuality();
             clearInterval(this.runInterval);
+            this.testDone = false;
             console.log("Run Result", this.result);
             resolve(this.result);
           }
         } else {
           clearInterval(this.runInterval);
+          this.testDone = false;
           resolve(this.result);
         }
       }, this.runIntervalTimeout);
     });
   };
 
+  /**
+   * The checkStats calls the getStas on the Publisher object to compute bandwidth and packet loss for audio and video.
+   * The bandwidth is computed by dividing bits (bytes*8) sent by the elapsed time (nowTimeStamp - prevTimestamp).
+   * The PL Ratio is computed by dividing Packet Loss by Total Packets.
+   * @param {*} publisher
+   */
   const checkStats = async (publisher) => {
     let nowTimestamp = Date.now() / 1000;
     if (!publisher) {
@@ -113,18 +126,12 @@ function pubStats() {
         this.prevTimestamp = nowTimestamp;
         this.prevAudioBytes = audioStats.packetsSent;
         this.prevVideoBytes = videoStats.packetsSent;
-        console.log("checkStats - Audio", this.audioBw);
-        console.log("checkStats - Video", this.videoBw);
         resolve();
       });
     });
   };
 
   const checkQuality = () => {
-    console.log("audioBw", this.audioBw);
-    console.log("audioPLRatio", this.audioPLRatio);
-    console.log("videoBw", this.videoBw);
-    console.log("videoPLRatio", this.videoPLRatio);
     this.testDone = true;
     this.result = {
       audio: {

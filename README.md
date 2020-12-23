@@ -19,6 +19,29 @@ On the top of pubStats.js file, there are the following parameters:
 
 Bandwidth and packet loss are taken from [Opentok Bandwidth Rules](https://support.tokbox.com/hc/en-us/articles/360029732311-What-is-the-minimum-bandwidth-requirement-to-use-OpenTok-).
 
+
+## Code
+
+The get stats code is contained in the `js/pubStats` file. 
+The main function is the run function which runs the code to computed bandwith and packet loss values.
+
+Example: 
+
+```
+// From your main file: 
+
+function checkNetwork(){
+setInterval(() => {
+    const aStats = pubStats();
+    aStats.run(publisher).then((result) => {
+      document.getElementById("network-status").innerHTML = result.message;
+    });
+  }, 5000);
+}
+
+
+```
+
 ## Result
 
 The result object is composed by: 

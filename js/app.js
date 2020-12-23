@@ -47,10 +47,14 @@ function initializeSession() {
 
 function runStats() {
   if (publisher) {
-    const aStats = pubStats();
-    aStats.run(publisher).then((result) => {
-      console.log("GetStats Test done: ", result);
-    });
+    setInterval(() => {
+      console.log("pubStats - run");
+      const aStats = pubStats();
+      aStats.run(publisher).then((result) => {
+        console.log("GetStats Test done: ", result);
+        document.getElementById("network-status").innerHTML = result.message;
+      });
+    }, 5000);
   }
 }
 
