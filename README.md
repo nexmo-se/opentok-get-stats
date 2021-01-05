@@ -10,8 +10,8 @@ On the top of pubStats.js file, there are the following parameters:
 
 | Parameter   |      Description      | 
 |----------|:-------------------------------:|
-| RUN\_INTERVAL\_TIMEOUT |  The intervals (in seconds) on how often to execute the code  | 
-| TEST\_TIME\_SPAN |   Running time of the test   | 
+| RUN\_INTERVAL\_TIMEOUT |  The intervals (in milli seconds) on how often to execute the code  | 
+| TEST\_TIME\_SPAN |   Running time of the test (in seconds)  | 
 | AUDIO\_BW\_THRESHOLD|  Threshold for audio bandwidth  | 
 | AUDIO\_PL |  Audio Packet Loss   | 
 | VIDEO\_BW\_THRESHOLD | Threshold for video bandwidth    | 
@@ -44,7 +44,9 @@ setInterval(() => {
 
 The run function computes every X ms the bandwidth and PL values for the audio and video MediaStreams. For example, if you set RUN\_INTERVAL\_TIMEOUT to 500, it will compute the values every 0.5s. To have a consistent result, the test needs to run for an interval of time defined by the TEST\_TIME\_SPAN value. 
 
-Example: RUN\_INTERVAL\_TIMEOUT=500, TEST\_TIME\_SPAN=3
+Example: `RUN\_INTERVAL\_TIMEOUT=500, TEST\_TIME\_SPAN=3`
+
+The function will compute the values every 500ms for 3 seconds and then return the result.
 
 
 ## Result
