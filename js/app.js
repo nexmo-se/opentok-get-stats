@@ -1,6 +1,8 @@
-var apiKey = "";
-var sessionId = "";
-var token = "";
+var apiKey = "46501052";
+var sessionId =
+  "2_MX40NjUwMTA1Mn5-MTYwNzUxNzA0MzI0OX5mbzFOY044MTNIUE9nR25UMVluVzNyc21-fg";
+var token =
+  "T1==cGFydG5lcl9pZD00NjUwMTA1MiZzaWc9ZDIyMmQ0N2IyMmI4YWRjZDE0MDBmN2I3OTYyZDc4MmJhMTY5Zjc4MTpzZXNzaW9uX2lkPTJfTVg0ME5qVXdNVEExTW41LU1UWXdOelV4TnpBME16STBPWDVtYnpGT1kwNDRNVE5JVUU5blIyNVVNVmx1VnpOeWMyMS1mZyZjcmVhdGVfdGltZT0xNjA3NTE3MDU1Jm5vbmNlPTAuODc1NTQwNjk2NjQwMzA1OSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjEwMTA5MDU0JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
 var publisher;
 
 function handleError(error) {
