@@ -1,5 +1,5 @@
 const RUN_INTERVAL_TIMEOUT = 500; // Run test every X ms
-const TEST_TIME_SPAN = 5;
+const TEST_TIME_SPAN = 3;
 const AUDIO_BW_THRESHOLD = 25e3;
 const AUDIO_PL = 0.05;
 const VIDEO_BW_THRESHOLD = 150e3;
