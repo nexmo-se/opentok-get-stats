@@ -10,8 +10,6 @@ const AUDIO_VIDEO_SUPPORTED = "AUDIO_VIDEO_SUPPORTED";
 
 // Based on: https://support.tokbox.com/hc/en-us/articles/360029732311-What-is-the-minimum-bandwidth-requirement-to-use-OpenTok-
 
-// I should build the stats for Audio and Video at the same time
-
 function pubStats() {
   this.startTestTime = 0;
   this.prevTimestamp = 0;
@@ -68,6 +66,7 @@ function pubStats() {
    * The checkStats calls the getStas on the Publisher object to compute bandwidth and packet loss for audio and video.
    * The bandwidth is computed by dividing bits (bytes*8) sent by the elapsed time (nowTimeStamp - prevTimestamp).
    * The PL Ratio is computed by dividing Packet Loss by Total Packets.
+   * The process is done both for audio and video values.
    * @param {*} publisher
    */
   const checkStats = async (publisher) => {
@@ -131,6 +130,10 @@ function pubStats() {
     });
   };
 
+  /**
+   * The checkQuality function computes the result based 
+   * on the threshold values and the values computed on the previous step.
+   */
   const checkQuality = () => {
     this.testDone = true;
     this.result = {
