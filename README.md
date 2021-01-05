@@ -42,6 +42,11 @@ setInterval(() => {
 
 ```
 
+The run function computes every X ms the bandwidth and PL values for the audio and video MediaStreams. For example, if you set RUN\_INTERVAL\_TIMEOUT to 500, it will compute the values every 0.5s. To have a consistent result, the test needs to run for an interval of time defined by the TEST\_TIME\_SPAN value. 
+
+Example: RUN\_INTERVAL\_TIMEOUT=500, TEST\_TIME\_SPAN=3
+
+
 ## Result
 
 The result object is composed by: 
