@@ -121,10 +121,9 @@ function pubStats() {
         this.videoBw =
           (8 * (videoStats.bytesSent - this.prevVideoBytes)) /
           (nowTimestamp - this.prevTimestamp);
-
         this.prevTimestamp = nowTimestamp;
-        this.prevAudioBytes = audioStats.packetsSent;
-        this.prevVideoBytes = videoStats.packetsSent;
+        this.prevAudioBytes = audioStats.bytesSent;
+        this.prevVideoBytes = videoStats.bytesSent;
         resolve();
       });
     });

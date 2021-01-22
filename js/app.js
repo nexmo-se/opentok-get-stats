@@ -1,6 +1,8 @@
-var apiKey = "";
-var sessionId = "";
-var token = "";
+var apiKey = "46501052";
+var sessionId =
+  "2_MX40NjUwMTA1Mn5-MTYwNzUxNzA0MzI0OX5mbzFOY044MTNIUE9nR25UMVluVzNyc21-fg";
+var token =
+  "T1==cGFydG5lcl9pZD00NjUwMTA1MiZzaWc9YTIyMGQzNzhmMDk1NjczYzRkNWMwZjczYWYxN2Q1NGMzNTJkNjRjODpzZXNzaW9uX2lkPTJfTVg0ME5qVXdNVEExTW41LU1UWXdOelV4TnpBME16STBPWDVtYnpGT1kwNDRNVE5JVUU5blIyNVVNVmx1VnpOeWMyMS1mZyZjcmVhdGVfdGltZT0xNjExMjQzNTgzJm5vbmNlPTAuODQzMjkzMDU1NTUzNTg4OSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjEzODM1NTgzJmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
 var publisher;
 
 function handleError(error) {
@@ -11,7 +13,7 @@ function handleError(error) {
 
 function initializeSession() {
   var session = OT.initSession(apiKey, sessionId, {});
-  publisher = OT.initPublisher("publisher");
+  publisher = OT.initPublisher("publisher", { resolution: "1280x720" });
 
   session.on("streamCreated", function streamCreated(event) {
     var subscriberOptions = {
@@ -45,6 +47,11 @@ function initializeSession() {
 
 function runStats() {
   if (publisher) {
+    /* const aStats = pubStats();
+    aStats.run(publisher).then((result) => {
+      console.log("GetStats Test done: ", result);
+      document.getElementById("network-status").innerHTML = result.message;
+    }); */
     setInterval(() => {
       console.log("pubStats - run");
       const aStats = pubStats();
