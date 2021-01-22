@@ -1,4 +1,4 @@
-const RUN_INTERVAL_TIMEOUT = 500; // Run test every X ms
+const RUN_INTERVAL_TIMEOUT = 200; // Run test every X ms
 const TEST_TIME_SPAN = 3;
 const AUDIO_BW_THRESHOLD = 25e3;
 const AUDIO_PL = 0.05;
@@ -130,7 +130,7 @@ function pubStats() {
   };
 
   /**
-   * The checkQuality function computes the result based 
+   * The checkQuality function computes the result based
    * on the threshold values and the values computed on the previous step.
    */
   const checkQuality = () => {
