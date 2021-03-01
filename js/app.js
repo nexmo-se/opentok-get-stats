@@ -2,6 +2,7 @@ var apiKey = "";
 var sessionId = "";
 var token = "";
 var publisher;
+let runInternal = null;
 
 function handleError(error) {
   if (error) {
@@ -27,8 +28,20 @@ function initializeSession() {
     );
   });
 
+  function updateSessionStatus(status) {
+    document.getElementById("session-connection").innerHTML = status;
+  }
+
+  session.on("sessionReconnecting", function sessionDisconnected(event) {
+    updateSessionStatus("reconnecting");
+  });
+
+  session.on("sessionReconnected", function sessionDisconnected(event) {
+    updateSessionStatus("connected");
+  });
+
   session.on("sessionDisconnected", function sessionDisconnected(event) {
-    console.log("You were disconnected from the session.", event.reason);
+    updateSessionStatus("disconnected");
   });
 
   // Connect to the session
@@ -38,30 +51,50 @@ function initializeSession() {
     } else {
       // If the connection is successful, publish the publisher to the session
       console.log("Connected", publisher);
+      updateSessionStatus("connected");
       session.publish(publisher, handleError);
     }
   });
 } // todo complete with get-stats // See the config.js file.
 
+function updateStats({ audio, video }) {
+  if (audio) {
+    document.getElementById("audio-network-status").innerHTML = audio.supported;
+    document.getElementById("audio-estimated-bandwidth").innerHTML = Math.round(
+      audio.audioBw
+    );
+    document.getElementById("audio-estimated-pl").innerHTML =
+      audio.audioPLRatio;
+  }
+  if (video) {
+    document.getElementById("video-network-status").innerHTML = video.supported;
+    document.getElementById("video-estimated-bandwidth").innerHTML = Math.round(
+      video.videoBw
+    );
+    document.getElementById("video-estimated-pl").innerHTML =
+      video.videoPLRatio;
+  }
+}
+
 function runStats() {
   if (publisher) {
-    /* const aStats = pubStats();
-    aStats.run(publisher).then((result) => {
-      console.log("GetStats Test done: ", result);
-      document.getElementById("network-status").innerHTML = result.message;
-    }); */
-    setInterval(() => {
+    runInternal = setInterval(() => {
       console.log("pubStats - run");
       const aStats = pubStats();
       aStats.run(publisher).then((result) => {
         console.log("GetStats Test done: ", result);
-        document.getElementById("network-status").innerHTML = result.message;
+        updateStats({ audio: result.audio, video: result.video });
       });
-    }, 5000);
+    }, 2500);
   }
 }
 
-document.getElementById("get-stats").addEventListener("click", runStats);
+function stopStats() {
+  clearInterval(runInternal);
+}
+
+document.getElementById("get-stats-start").addEventListener("click", runStats);
+document.getElementById("get-stats-stop").addEventListener("click", stopStats);
 
 if (apiKey && sessionId && token) {
   initializeSession();
