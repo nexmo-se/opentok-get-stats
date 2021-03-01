@@ -2,8 +2,9 @@ var apiKey = "46501052";
 var sessionId =
   "2_MX40NjUwMTA1Mn5-MTYwNzUxNzA0MzI0OX5mbzFOY044MTNIUE9nR25UMVluVzNyc21-fg";
 var token =
-  "T1==cGFydG5lcl9pZD00NjUwMTA1MiZzaWc9YTIyMGQzNzhmMDk1NjczYzRkNWMwZjczYWYxN2Q1NGMzNTJkNjRjODpzZXNzaW9uX2lkPTJfTVg0ME5qVXdNVEExTW41LU1UWXdOelV4TnpBME16STBPWDVtYnpGT1kwNDRNVE5JVUU5blIyNVVNVmx1VnpOeWMyMS1mZyZjcmVhdGVfdGltZT0xNjExMjQzNTgzJm5vbmNlPTAuODQzMjkzMDU1NTUzNTg4OSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjEzODM1NTgzJmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
+  "T1==cGFydG5lcl9pZD00NjUwMTA1MiZzaWc9Zjg3OTcwNzYyZWU3NTY4ZjRkNjA0ODA3Mjc2MWRlNzNjOTQ3ZjIxMDpzZXNzaW9uX2lkPTJfTVg0ME5qVXdNVEExTW41LU1UWXdOelV4TnpBME16STBPWDVtYnpGT1kwNDRNVE5JVUU5blIyNVVNVmx1VnpOeWMyMS1mZyZjcmVhdGVfdGltZT0xNjE0NjA2NzQwJm5vbmNlPTAuMzczNjUwMjAzMDgwMjQ0OSZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjE3MTk1MTM5JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9";
 var publisher;
+let runInternal = null;
 
 function handleError(error) {
   if (error) {
@@ -29,8 +30,20 @@ function initializeSession() {
     );
   });
 
+  function updateSessionStatus(status) {
+    document.getElementById("session-connection").innerHTML = status;
+  }
+
+  session.on("sessionReconnecting", function sessionDisconnected(event) {
+    updateSessionStatus("reconnecting");
+  });
+
+  session.on("sessionReconnected", function sessionDisconnected(event) {
+    updateSessionStatus("connected");
+  });
+
   session.on("sessionDisconnected", function sessionDisconnected(event) {
-    console.log("You were disconnected from the session.", event.reason);
+    updateSessionStatus("disconnected");
   });
 
   // Connect to the session
@@ -40,30 +53,50 @@ function initializeSession() {
     } else {
       // If the connection is successful, publish the publisher to the session
       console.log("Connected", publisher);
+      updateSessionStatus("connected");
       session.publish(publisher, handleError);
     }
   });
 } // todo complete with get-stats // See the config.js file.
 
+function updateStats({ audio, video }) {
+  if (audio) {
+    document.getElementById("audio-network-status").innerHTML = audio.supported;
+    document.getElementById("audio-estimated-bandwidth").innerHTML = Math.round(
+      audio.audioBw
+    );
+    document.getElementById("audio-estimated-pl").innerHTML =
+      audio.audioPLRatio;
+  }
+  if (video) {
+    document.getElementById("video-network-status").innerHTML = video.supported;
+    document.getElementById("video-estimated-bandwidth").innerHTML = Math.round(
+      video.videoBw
+    );
+    document.getElementById("video-estimated-pl").innerHTML =
+      video.videoPLRatio;
+  }
+}
+
 function runStats() {
   if (publisher) {
-    /* const aStats = pubStats();
-    aStats.run(publisher).then((result) => {
-      console.log("GetStats Test done: ", result);
-      document.getElementById("network-status").innerHTML = result.message;
-    }); */
-    setInterval(() => {
+    runInternal = setInterval(() => {
       console.log("pubStats - run");
       const aStats = pubStats();
       aStats.run(publisher).then((result) => {
         console.log("GetStats Test done: ", result);
-        document.getElementById("network-status").innerHTML = result.message;
+        updateStats({ audio: result.audio, video: result.video });
       });
-    }, 5000);
+    }, 2500);
   }
 }
 
-document.getElementById("get-stats").addEventListener("click", runStats);
+function stopStats() {
+  clearInterval(runInternal);
+}
+
+document.getElementById("get-stats-start").addEventListener("click", runStats);
+document.getElementById("get-stats-stop").addEventListener("click", stopStats);
 
 if (apiKey && sessionId && token) {
   initializeSession();

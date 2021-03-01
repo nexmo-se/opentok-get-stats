@@ -1,5 +1,5 @@
-const RUN_INTERVAL_TIMEOUT = 500; // Run test every X ms
-const TEST_TIME_SPAN = 3;
+const RUN_INTERVAL_TIMEOUT = 200; // Run test every X ms
+const TEST_TIME_SPAN = 2;
 const AUDIO_BW_THRESHOLD = 25e3;
 const AUDIO_PL = 0.05;
 const VIDEO_BW_THRESHOLD = 150e3;
@@ -52,7 +52,6 @@ function pubStats() {
             checkQuality();
             clearInterval(this.runInterval);
             this.testDone = false;
-            console.log("Run Result", this.result);
             resolve(this.result);
           }
         } else {
