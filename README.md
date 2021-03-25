@@ -68,4 +68,10 @@ The result object is composed by:
 
 Set the credentials on the `app.js` file (apikey, sessionId, token). Then, open the `index.html` page and click the `Run Stats` button.
 
+## Heroku Deployment
 
+We use simple PHP server to serve static website, and deploying to Heroku is pretty straightforward
+
+1. Create application on Heroku
+2. Link Heroku to your local repo. The command might start with `heroku git:remote -a <your_app_name>`
+3. `git push heroku master` or any Heroku push command
